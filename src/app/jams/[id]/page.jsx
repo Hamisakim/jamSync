@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import WebcamRecorder from './WebcamRecorder';
@@ -8,6 +9,7 @@ import {
   getVideos,
 } from '@/utils/firebase/queries';
 import { getVideosByJamId } from '@/utils/firebase/queries';
+import MultiVideoPlayer from './MultiVideoPlayer';
 
 const page = async ({ params }) => {
   const { id } = await params;
@@ -32,9 +34,7 @@ const page = async ({ params }) => {
         <div>
           <div>
             <div className="w-full grid grid-cols-3 gap-4">
-              {videos.map((video) => (
-                <VideoPlayer key={video} url={video} />
-              ))}
+              <MultiVideoPlayer videos={videos} jamId={jamId} />
               <WebcamRecorder jamId={jamId} />
             </div>
           </div>

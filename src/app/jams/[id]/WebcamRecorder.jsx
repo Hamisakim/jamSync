@@ -4,9 +4,6 @@ import { storage } from '@/utils/firebase/firebaseConfig';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 const WebcamRecorder = ({ jamId }) => {
-
-  console.log('🚀 ~ file: WebcamRecorder.js:8 ~ WebcamRecorder ~ jamId:', jamId);
-
   const videoRef = useRef(null);
   const [recording, setRecording] = useState(false);
   const [videoBlob, setVideoBlob] = useState(null);
@@ -22,13 +19,12 @@ const WebcamRecorder = ({ jamId }) => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: true,
-          audio: true, // Enable audio recording
+          audio: true,
         });
 
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
-
         setError(null);
       } catch (err) {
         console.error('Error accessing media devices:', err);
@@ -40,10 +36,9 @@ const WebcamRecorder = ({ jamId }) => {
 
     return () => {
       const currentVideoRef = videoRef.current;
-      if (currentVideoRef && currentVideoRef.srcObject) {
-        const stream = currentVideoRef.srcObject;
-        const tracks = stream.getTracks();
-        tracks.forEach((track) => track.stop());
+      if (currentVideoRef?.srcObject) {
+        const tracks = currentVideoRef.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
       }
     };
   }, []);
@@ -53,16 +48,20 @@ const WebcamRecorder = ({ jamId }) => {
       setRecording(true);
       chunksRef.current = [];
 
-      const options = {
-        mimeType: 'video/webm;codecs=vp8,opus', // Include opus codec for audio
-        audioBitsPerSecond: 128000,
-        videoBitsPerSecond: 2500000,
-      };
+      let options = { mimeType: 'video/webm;codecs=vp8,opus' };
+      
+      // Fallback options if primary format isn't supported
+      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        options = { mimeType: 'video/webm' };
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+          options = { mimeType: 'video/mp4' };
+          if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+            options = {}; // Let browser choose format
+          }
+        }
+      }
 
-      const mediaRecorder = new MediaRecorder(
-        videoRef.current.srcObject,
-        options
-      );
+      const mediaRecorder = new MediaRecorder(videoRef.current.srcObject, options);
       mediaRecorderRef.current = mediaRecorder;
 
       mediaRecorder.ondataavailable = (event) => {
@@ -72,13 +71,11 @@ const WebcamRecorder = ({ jamId }) => {
       };
 
       mediaRecorder.onstop = () => {
-        const videoBlob = new Blob(chunksRef.current, {
-          type: 'video/webm;codecs=vp8,opus',
-        });
-        setVideoBlob(videoBlob);
+        const blob = new Blob(chunksRef.current, { type: options.mimeType || 'video/webm' });
+        setVideoBlob(blob);
       };
 
-      mediaRecorder.start(1000); // Collect data every second
+      mediaRecorder.start(1000);
     } catch (err) {
       console.error('Error starting recording:', err);
       setError('Failed to start recording: ' + err.message);
@@ -98,7 +95,6 @@ const WebcamRecorder = ({ jamId }) => {
     try {
       setUploading(true);
       setUploadProgress(0);
-      //jamTitle/number
       const fileName = `${jamId}/${Date.now()}.webm`;
       const storageRef = ref(storage, fileName);
       const uploadTask = uploadBytesResumable(storageRef, videoBlob);
@@ -110,7 +106,6 @@ const WebcamRecorder = ({ jamId }) => {
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100
           );
           setUploadProgress(progress);
-          console.log(`Upload is ${progress}% done`);
         },
         (error) => {
           console.error('Error uploading video:', error);
@@ -121,7 +116,6 @@ const WebcamRecorder = ({ jamId }) => {
           try {
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
             console.log('File uploaded successfully! URL:', downloadURL);
-            // Here you could update your Firestore document with the video URL
             setUploading(false);
             setUploadProgress(100);
           } catch (err) {
