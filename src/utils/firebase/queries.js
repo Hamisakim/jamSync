@@ -65,8 +65,6 @@ export const getVideos = async () => {
 };
 
 export const getVideosByJamId = async (jamId) => {
-  console.log('🚀 ~ file: queries.js:66 ~ getVideosByJamId ~ jamId:', jamId);
-  const url = `videos`;
   const videosRef = ref(storage, jamId + '/');
   const res = await listAll(videosRef);
   const urls = [];
