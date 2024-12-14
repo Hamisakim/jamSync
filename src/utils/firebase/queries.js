@@ -51,7 +51,23 @@ export const getTracksByJamId = async (jamId) => {
 };
 
 export const getVideos = async () => {
-  const videosRef = ref(storage, 'videos');
+  const videosRef = ref(storage, 'P7UQNtxTapthYrT5yOhc/');
+  const res = await listAll(videosRef);
+  const urls = [];
+  for (const item of res.items) {
+    const url = await getDownloadURL(item);
+
+    console.log('🚀 ~ file: queries.js:60 ~ getVideos ~ url:', url);
+
+    urls.push(url);
+  }
+  return urls;
+};
+
+export const getVideosByJamId = async (jamId) => {
+  console.log('🚀 ~ file: queries.js:66 ~ getVideosByJamId ~ jamId:', jamId);
+  const url = `videos`;
+  const videosRef = ref(storage, jamId + '/');
   const res = await listAll(videosRef);
   const urls = [];
   for (const item of res.items) {
@@ -60,16 +76,3 @@ export const getVideos = async () => {
   }
   return urls;
 };
-
-// export const getVideosByJamId = async (jamId) => {
-//   console.log('🚀 ~ file: queries.js:66 ~ getVideosByJamId ~ jamId:', jamId);
-//   const url = `videos`;
-//   const videosRef = ref(storage, url);
-//   const res = await listAll(videosRef);
-//   const urls = [];
-//   for (const item of res.items) {
-//     const url = await getDownloadURL(item);
-//     urls.push(url);
-//   }
-//   return urls;
-// };

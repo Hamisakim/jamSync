@@ -99,7 +99,7 @@ const WebcamRecorder = ({ jamId }) => {
       setUploading(true);
       setUploadProgress(0);
       //jamTitle/number
-      const fileName = `videos/${jamId}/${Date.now()}.webm`;
+      const fileName = `${jamId}/${Date.now()}.webm`;
       const storageRef = ref(storage, fileName);
       const uploadTask = uploadBytesResumable(storageRef, videoBlob);
 

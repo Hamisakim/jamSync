@@ -20,10 +20,14 @@ const page = async ({ params }) => {
   // const filteredTracks = allTracks.filter((track) => track.jamId === jamId);
   // const filteredTracks = allTracks.filter((track) => track.jamId.id === jamId);
 
-  const allVideos = await getVideos();
-  // const videos = await getVideosByJamId(jamId);
+  // const allVideos = await getVideos();
 
-  console.log('🚀 ~ file: page.js:25 ~ page ~ videos:', videos);
+
+  const videos = await getVideosByJamId(jamId);
+
+  console.log('🚀 ~ file: page.js:28 ~ page ~ videos:', videos);
+
+
 
   return (
     <div>
@@ -34,10 +38,10 @@ const page = async ({ params }) => {
           <h1>Strings</h1>
 
           <div className="w-80">
-            {allVideos.map((video) => (
+            {/* {allVideos.map((video) => (
               // <VideoPlayer key={video} url={video} />
               null
-            ))}
+            ))} */}
 
 
             {/* {filteredTracks.map((track) => (
