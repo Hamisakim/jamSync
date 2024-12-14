@@ -22,37 +22,24 @@ const page = async ({ params }) => {
 
   // const allVideos = await getVideos();
 
-
   const videos = await getVideosByJamId(jamId);
 
   console.log('🚀 ~ file: page.js:28 ~ page ~ videos:', videos);
-
-
 
   return (
     <div>
       <div className="instruments ">
         <div>
-          <WebcamRecorder jamId={jamId} />
-
-          <h1>Strings</h1>
-
-          <div className="w-80">
-            {/* {allVideos.map((video) => (
-              // <VideoPlayer key={video} url={video} />
-              null
-            ))} */}
-
-
-            {/* {filteredTracks.map((track) => (
-              <VideoPlayer key={track.id} track={track} />
-            ))} */}
+          <div>
+            <div className="w-full grid grid-cols-3 gap-4">
+              {videos.map((video) => (
+                <VideoPlayer key={video} url={video} />
+              ))}
+              <WebcamRecorder jamId={jamId} />
+            </div>
           </div>
-
-          {/* <VideoPlayer /> */}
         </div>
       </div>
-
     </div>
   );
 };
