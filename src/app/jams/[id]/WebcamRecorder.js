@@ -3,7 +3,10 @@ import { useEffect, useRef, useState } from 'react';
 import { storage } from '@/utils/firebase/firebaseConfig';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
-const WebcamRecorder = ({ trackId }) => {
+const WebcamRecorder = ({ jamId }) => {
+
+  console.log('🚀 ~ file: WebcamRecorder.js:8 ~ WebcamRecorder ~ jamId:', jamId);
+
   const videoRef = useRef(null);
   const [recording, setRecording] = useState(false);
   const [videoBlob, setVideoBlob] = useState(null);
@@ -21,11 +24,11 @@ const WebcamRecorder = ({ trackId }) => {
           video: true,
           audio: true, // Enable audio recording
         });
-        
+
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
-        
+
         setError(null);
       } catch (err) {
         console.error('Error accessing media devices:', err);
@@ -56,7 +59,10 @@ const WebcamRecorder = ({ trackId }) => {
         videoBitsPerSecond: 2500000,
       };
 
-      const mediaRecorder = new MediaRecorder(videoRef.current.srcObject, options);
+      const mediaRecorder = new MediaRecorder(
+        videoRef.current.srcObject,
+        options
+      );
       mediaRecorderRef.current = mediaRecorder;
 
       mediaRecorder.ondataavailable = (event) => {
@@ -66,8 +72,8 @@ const WebcamRecorder = ({ trackId }) => {
       };
 
       mediaRecorder.onstop = () => {
-        const videoBlob = new Blob(chunksRef.current, { 
-          type: 'video/webm;codecs=vp8,opus' 
+        const videoBlob = new Blob(chunksRef.current, {
+          type: 'video/webm;codecs=vp8,opus',
         });
         setVideoBlob(videoBlob);
       };
@@ -92,8 +98,8 @@ const WebcamRecorder = ({ trackId }) => {
     try {
       setUploading(true);
       setUploadProgress(0);
-      
-      const fileName = `videos/${trackId || Date.now()}.webm`;
+      //jamTitle/number
+      const fileName = `videos/${jamId}/${Date.now()}.webm`;
       const storageRef = ref(storage, fileName);
       const uploadTask = uploadBytesResumable(storageRef, videoBlob);
 
@@ -140,10 +146,10 @@ const WebcamRecorder = ({ trackId }) => {
         </div>
       )}
 
-      <video 
-        ref={videoRef} 
-        autoPlay 
-        muted 
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
         className="w-full aspect-video bg-black rounded-lg"
       />
 
