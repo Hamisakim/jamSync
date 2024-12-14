@@ -1,114 +1,195 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { storage } from '@/utils/firebase/firebaseConfig';
-
-
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
+const WebcamRecorder = ({ jamId }) => {
 
-const WebcamRecorder = () => {
-  const videoRef = useRef(null); // Ref to display the video on the page
+  console.log('🚀 ~ file: WebcamRecorder.js:8 ~ WebcamRecorder ~ jamId:', jamId);
+
+  const videoRef = useRef(null);
   const [recording, setRecording] = useState(false);
-  const [videoBlob, setVideoBlob] = useState(null); // The video blob (file) after recording
+  const [videoBlob, setVideoBlob] = useState(null);
+  const [error, setError] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
 
   useEffect(() => {
-    const startVideo = async () => {
+    const startVideoAndAudio = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: true,
+          audio: true, // Enable audio recording
         });
-        videoRef.current.srcObject = stream;
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+
+        setError(null);
       } catch (err) {
-        console.error('Error accessing webcam:', err);
+        console.error('Error accessing media devices:', err);
+        setError(err.message);
       }
     };
 
-    startVideo();
+    startVideoAndAudio();
 
     return () => {
-        const currentVideoRef = videoRef.current;
-        if (currentVideoRef && currentVideoRef.srcObject) {
-            const stream = currentVideoRef.srcObject;
-            const tracks = stream.getTracks();
-            tracks.forEach((track) => track.stop());
-        }
+      const currentVideoRef = videoRef.current;
+      if (currentVideoRef && currentVideoRef.srcObject) {
+        const stream = currentVideoRef.srcObject;
+        const tracks = stream.getTracks();
+        tracks.forEach((track) => track.stop());
+      }
     };
   }, []);
 
   const startRecording = () => {
-    setRecording(true);
-    chunksRef.current = []; // Clear any previous chunks
+    try {
+      setRecording(true);
+      chunksRef.current = [];
 
-    const mediaRecorder = new MediaRecorder(videoRef.current.srcObject);
-    mediaRecorderRef.current = mediaRecorder;
+      const options = {
+        mimeType: 'video/webm;codecs=vp8,opus', // Include opus codec for audio
+        audioBitsPerSecond: 128000,
+        videoBitsPerSecond: 2500000,
+      };
 
-    mediaRecorder.ondataavailable = (event) => {
-      chunksRef.current.push(event.data);
-    };
+      const mediaRecorder = new MediaRecorder(
+        videoRef.current.srcObject,
+        options
+      );
+      mediaRecorderRef.current = mediaRecorder;
 
-    mediaRecorder.onstop = () => {
-      const videoBlob = new Blob(chunksRef.current, { type: 'video/webm' });
-      setVideoBlob(videoBlob);
-    };
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunksRef.current.push(event.data);
+        }
+      };
 
-    mediaRecorder.start();
+      mediaRecorder.onstop = () => {
+        const videoBlob = new Blob(chunksRef.current, {
+          type: 'video/webm;codecs=vp8,opus',
+        });
+        setVideoBlob(videoBlob);
+      };
+
+      mediaRecorder.start(1000); // Collect data every second
+    } catch (err) {
+      console.error('Error starting recording:', err);
+      setError('Failed to start recording: ' + err.message);
+    }
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current) {
+    if (mediaRecorderRef.current && recording) {
       mediaRecorderRef.current.stop();
+      setRecording(false);
     }
-    setRecording(false);
   };
 
   const uploadVideoToStorage = async (videoBlob) => {
-    // Create a reference to Firebase Storage (change 'videos' to the desired folder)
-    const storageRef = ref(storage, `videos/${Date.now()}.webm`);
+    if (!videoBlob) return;
 
-    // Upload the Blob to Firebase Storage
-    const uploadTask = uploadBytesResumable(storageRef, videoBlob);
+    try {
+      setUploading(true);
+      setUploadProgress(0);
+      //jamTitle/number
+      const fileName = `${jamId}/${Date.now()}.webm`;
+      const storageRef = ref(storage, fileName);
+      const uploadTask = uploadBytesResumable(storageRef, videoBlob);
 
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Upload is ${progress}% done');
-      },
-      (error) => {
-        console.error('Error uploading video:', error);
-      },
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        console.log('File uploaded successfully! Video URL:', downloadURL);
-      }
-    );
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setUploadProgress(progress);
+          console.log(`Upload is ${progress}% done`);
+        },
+        (error) => {
+          console.error('Error uploading video:', error);
+          setError('Failed to upload: ' + error.message);
+          setUploading(false);
+        },
+        async () => {
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            console.log('File uploaded successfully! URL:', downloadURL);
+            // Here you could update your Firestore document with the video URL
+            setUploading(false);
+            setUploadProgress(100);
+          } catch (err) {
+            console.error('Error getting download URL:', err);
+            setError('Failed to get download URL: ' + err.message);
+            setUploading(false);
+          }
+        }
+      );
+    } catch (err) {
+      console.error('Error initiating upload:', err);
+      setError('Failed to start upload: ' + err.message);
+      setUploading(false);
+    }
   };
 
   return (
-    <div className="w-full border border-red-50">
-      <video ref={videoRef} autoPlay muted></video>
-
-      {!recording ? (
-        <button onClick={startRecording}>Start Recording</button>
-      ) : (
-        <button onClick={stopRecording}>Stop Recording</button>
+    <div className="w-full p-4 space-y-4 rounded-lg border border-gray-200">
+      {error && (
+        <div className="p-3 text-sm text-red-500 bg-red-50 rounded">
+          {error}
+        </div>
       )}
 
-      {videoBlob && (
-        <div>
-          <button onClick={() => uploadVideoToStorage(videoBlob)}>
-            Upload Video
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        className="w-full aspect-video bg-black rounded-lg"
+      />
+
+      <div className="space-x-4">
+        {!recording ? (
+          <button
+            onClick={startRecording}
+            className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50"
+            disabled={uploading}
+          >
+            Start Recording
           </button>
+        ) : (
+          <button
+            onClick={stopRecording}
+            className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+          >
+            Stop Recording
+          </button>
+        )}
+
+        {videoBlob && !recording && (
+          <button
+            onClick={() => uploadVideoToStorage(videoBlob)}
+            className="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600 disabled:opacity-50"
+            disabled={uploading}
+          >
+            {uploading ? `Uploading: ${uploadProgress}%` : 'Upload Recording'}
+          </button>
+        )}
+      </div>
+
+      {videoBlob && !recording && (
+        <div className="mt-4">
+          <h3 className="text-lg font-medium mb-2">Preview:</h3>
           <video
-            className="w-60"
             controls
             src={URL.createObjectURL(videoBlob)}
-            style={{ marginTop: '10px', width: '100%' }}
-          ></video>
+            className="w-full rounded-lg"
+          />
         </div>
       )}
     </div>
