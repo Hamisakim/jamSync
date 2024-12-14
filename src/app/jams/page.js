@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { getJams, createJam } from '@/utils/firebase/queries';
 import JamCard from './JamCard';
 import NewJamCard from './NewJamCard';
+import Image from 'next/image';
 
 export default function Tracks() {
   const [myJams, setMyJams] = useState([]); // Track state for Jams
@@ -29,14 +30,39 @@ export default function Tracks() {
 
   return (
     <>
-      <h1>Jams</h1>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {myJams.map((jam, index) => (
-          <JamCard key={index} jam={jam} />
-        ))}
+      <div className="bg-[#F1F5F7] min-h-screen">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex-shrink-0">
+              <Image
+                src="/images/JamSync2.png" // Path to the logo in the public folder
+                alt="JamSync Logo"
+                width={150} // Adjust the width as per your needs
+                height={50} // Adjust the height as per your needs
+              />
+            </div>
+            <h1 className="text-4xl font-bold text-center mb-6 font-poppins">
+              JamSync
+            </h1>
+            <p>Login</p>
+          </div>
 
-        {/* Render New Jam Card */}
-        <NewJamCard onCreate={handleCreateJam} />
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {myJams.map((jam, index) => (
+              <div
+                key={index}
+                className="border border-gray-200 rounded-lg shadow-md p-4 bg-white hover:shadow-lg transition-shadow duration-300"
+              >
+                <JamCard jam={jam} />
+              </div>
+            ))}
+
+            {/* Render New Jam Card */}
+            <div className="border border-dashed border-gray-300 rounded-lg p-4 flex justify-center items-center bg-gray-50 hover:bg-gray-100 transition-colors duration-300">
+              <NewJamCard onCreate={handleCreateJam} />
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

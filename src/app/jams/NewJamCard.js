@@ -27,7 +27,7 @@ export default function NewJamCard({ onCreate }) {
   };
 
   return (
-    <div className="border p-4 rounded shadow-sm">
+    <div className="w-full border p-4 rounded shadow-sm">
       <h2 className="text-lg font-bold mb-2">Create New Jam</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-2">
