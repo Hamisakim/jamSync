@@ -350,8 +350,11 @@ const VideoManager = ({ jamId, existingVideos = [] }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24 flex items-center">
+    <div className="min-h-screen bg-[#191825]  pb-24 flex flex-col items-center">
+      <h1 className='text-5xl font-bold text-white'>Jam Studio</h1>
+
       <div className="w-full">
+
         {error && (
           <div className="p-3 mx-auto max-w-6xl mb-4 text-sm text-red-500 bg-red-50 rounded">
             {error}

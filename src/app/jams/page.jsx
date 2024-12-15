@@ -45,32 +45,13 @@ export default function Tracks() {
       <div className="relative bg-[#191825] min-h-screen">
         {/* Hero Image Section */}
         <div
-          className="relative w-full h-[500px] bg-cover bg-center"
+          className="relative w-full bg-cover bg-fixed bg-s bg-no-repeat h-[500px]"
           style={{
             backgroundImage:
               'url(https://www.checkatrade.com/blog/wp-content/uploads/2020/10/Recording-studio-cost-to-build.jpg)',
           }}
         >
-          {/* Logo */}
-          <div className="absolute top-0 left-0 p-4 z-10">
-            <Image
-              src="/images/JamSync3.png" // Path to the logo in the public folder
-              alt="JamSync Logo"
-              width={150} // Adjust the width as per your needs
-              height={50} // Adjust the height as per your needs
-            />
-          </div>
 
-          {/* JamSync Title */}
-          {/* <h1 className="absolute top-1/3 left-1/2 transform -translate-x-1/2 text-4xl font-bold text-center text-white z-10">
-            JamSync
-          </h1> */}
-
-          {/* Login Text */}
-          <div className="absolute top-20 right-10 z-10 flex space-x-4">
-            <p className="text-white font-semibold text-lg">Login</p>
-            <p className="text-white font-semibold text-lg">Sign up</p>
-          </div>
 
           {/* Overlay for text visibility */}
           <div className="absolute inset-0 bg-black opacity-30 z-0"></div>
