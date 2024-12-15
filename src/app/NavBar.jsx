@@ -13,6 +13,11 @@ const NavBar = () => {
       </Link>
 
       <div className="flex items-center gap-6 ">
+        <Link href="/feedback">
+          <button className="text-white font-semibold text-lg hover:text-gray-300 transition-colors">
+            Feedback
+          </button>
+        </Link>
         <button className="text-white font-semibold text-lg hover:text-gray-300 transition-colors">
           Login
         </button>
