@@ -23,7 +23,7 @@ export default function FeedbackForm() {
   };
 
   return (
-    <div style={styles.container} className='mx-auto w-full'>
+    <div style={styles.container} className='mx-auto w-full text-white'>
       <h1>Feedback Form</h1>
       <form id="feedbackForm" onSubmit={handleSubmit} style={styles.form}>
         <label htmlFor="name" style={styles.label}>
