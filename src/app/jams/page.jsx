@@ -115,15 +115,6 @@ export default function Tracks() {
               </div>
             ))}
 
-            {/* {myJams.map((jam, index) => (
-            <div
-              key={index}
-              className="bg-[#F1F5F7] border border-gray-200 rounded-lg shadow-xl transform transition-all hover:scale-105 hover:shadow-2xl p-6"
-            >
-              <JamCard jam={jam} />
-            </div>
-          ))} */}
-
             {/* Render New Jam Card */}
             <div className="bg-gray-100 border border-dashed border-gray-300 rounded-lg p-6 flex justify-center items-center hover:bg-gray-200 transition-colors duration-300">
               <NewJamCard onCreate={handleCreateJam} />
@@ -147,35 +138,3 @@ export default function Tracks() {
     </>
   );
 }
-
-// import { getJams, createJam } from '@/utils/firebase/queries';
-// import JamCard from './JamCard';
-// import NewJamCard from './NewJamCard'; // Import the new component
-
-// export default async function Tracks() {
-//   const myJams = await getJams();
-
-//   // Function to handle creating a new Jam
-//   const handleCreateJam = async (newJamData) => {
-//     try {
-//       const newJam = await createJam(newJamData);
-//       setMyJams((prevJams) => [...prevJams, newJam]); // Add the new Jam to the list
-//     } catch (error) {
-//       console.error('Error creating Jam:', error);
-//     }
-//   };
-
-//   return (
-//     <>
-//       <h1>Jams test</h1>
-
-//       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-//         {myJams.map((jam, index) => (
-//           <JamCard key={index} jam={jam} />
-//         ))}
-//         {/* Render New Jam Card */}
-//         <NewJamCard onCreate={handleCreateJam} />
-//       </div>
-//     </>
-//   );
-// }

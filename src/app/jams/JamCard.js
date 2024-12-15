@@ -61,27 +61,46 @@ const JamCard = ({ jam }) => {
       <p className="text-lg text-gray-600 mt-1">Key: {jam.key}</p>
       <p className="text-lg text-gray-600 mt-1">BPM: {jam.bpm}</p>
 
-      {/* Rating Stars */}
-      <div className="flex items-center pt-2 pb-4 pl-0 ml-0">
-        {[...Array(5)].map((_, index) => (
-          <svg
-            key={index}
-            xmlns="http://www.w3.org/2000/svg"
-            fill={index < rating ? 'yellow' : 'gray'}
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            className="w-8 h-8 cursor-pointer"
-            onClick={() => setRating(index + 1)} // Optional: allow user to click and update the rating
+      {/* Rating and Voting Section */}
+      <div className="flex items-center justify-between pt-2 pb-4">
+        {/* Star Rating */}
+        <div className="flex items-center">
+          {[...Array(5)].map((_, index) => (
+            <svg
+              key={index}
+              xmlns="http://www.w3.org/2000/svg"
+              fill={index < rating ? 'yellow' : 'gray'}
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-8 h-8 cursor-pointer"
+              onClick={() => setRating(index + 1)} // Optional: allow user to click and update the rating
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1"
+                d="M12 4.5l1.42 4.38h4.63L14.8 11.5l1.42 4.38-3.6-2.63-3.6 2.63L10.2 11.5 7.92 8.88h4.63L12 4.5z"
+              />
+            </svg>
+          ))}
+        </div>
+        {/* Upvote/Downvote Buttons */}
+        <div className="flex space-x-2 items-center">
+          <button
+            className="bg-gray-400 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            // Add upvote functionality here later
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="1"
-              d="M12 4.5l1.42 4.38h4.63L14.8 11.5l1.42 4.38-3.6-2.63-3.6 2.63L10.2 11.5 7.92 8.88h4.63L12 4.5z"
-            />
-          </svg>
-        ))}
+            👍
+          </button>
+          <button
+            className="bg-gray-400 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            // Add downvote functionality here later
+          >
+            👎
+          </button>
+        </div>
       </div>
+
       <div className="flex align-middle justify-center">
         <button
           onClick={handlePreviewStop}
