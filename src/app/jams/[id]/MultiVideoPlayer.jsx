@@ -1,6 +1,8 @@
-'use client';
+'use client'
+// MultiVideoPlayer.jsx
 import React, { useState } from 'react';
-import { Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
+import VideoControls from './VideoControls';
 
 const VideoPlayer = ({ url }) => {
   const videoRef = React.useRef(null);
@@ -14,17 +16,17 @@ const VideoPlayer = ({ url }) => {
   };
 
   return (
-    <div className="relative group">
+    <div className="relative group w-full">
       <video
         ref={videoRef}
         src={url}
-        className="w-full rounded-lg aspect-video object-cover"
+        className="w-full rounded-md aspect-video object-cover bg-gray-100"
         playsInline
         loop
       />
       <button
         onClick={handleMuteToggle}
-        className="absolute bottom-2 right-2 p-2 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute bottom-2 right-2 p-1.5 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity"
       >
         {isMuted ? (
           <VolumeX className="w-4 h-4" />
@@ -36,7 +38,7 @@ const VideoPlayer = ({ url }) => {
   );
 };
 
-const MultiVideoPlayer = ({ videos = [], controls }) => {
+const MultiVideoPlayer = ({ videos = [] }) => {
   const [isPlaying, setIsPlaying] = useState(false);
 
   if (!videos || videos.length === 0) {
@@ -68,34 +70,26 @@ const MultiVideoPlayer = ({ videos = [], controls }) => {
     setIsPlaying(false);
   };
 
+  const getGridCols = (count) => {
+    if (count === 1) return 'grid-cols-1 max-w-2xl';
+    if (count === 2) return 'grid-cols-1 sm:grid-cols-2 max-w-4xl';
+    return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl';
+  };
+
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-4">
+    <div className="space-y-2 w-full mx-auto px-2">
+      <div className={`grid ${getGridCols(videos.length)} gap-2 place-items-center mx-auto`}>
         {videos.map((video, index) => (
           <VideoPlayer key={index} url={video} />
         ))}
       </div>
 
-      {controls && (
-        <div className="flex justify-center gap-4 p-4">
-          <button
-            onClick={isPlaying ? handlePauseAll : handlePlayAll}
-            className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white"
-          >
-            {isPlaying ? (
-              <Pause className="w-5 h-5" />
-            ) : (
-              <Play className="w-5 h-5" />
-            )}
-          </button>
-          <button
-            onClick={handleResetAll}
-            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300"
-          >
-            <RotateCcw className="w-5 h-5" />
-          </button>
-        </div>
-      )}
+      <VideoControls
+        mode="playback"
+        isPlaying={isPlaying}
+        onPlayPause={isPlaying ? handlePauseAll : handlePlayAll}
+        onReset={handleResetAll}
+      />
     </div>
   );
 };
