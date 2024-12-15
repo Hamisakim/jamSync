@@ -9,14 +9,26 @@ import Image from 'next/image';
 export default function Tracks() {
   const [myJams, setMyJams] = useState([]); // Track state for Jams
 
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Fetch Jams when the component mounts
   useEffect(() => {
     const fetchJams = async () => {
       const jams = await getJams();
+      console.log('Fetched Jams:', jams); // Check structure
       setMyJams(jams);
     };
     fetchJams();
   }, []);
+
+  // Filter Jam based on search query
+  const filteredJams = myJams.filter(
+    (jam) =>
+      (jam?.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (jam?.key || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (jam?.bpm || '').toString().includes(searchQuery) ||
+      (jam?.genre || '').toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   // Client-side handler for creating a new Jam
   const handleCreateJam = async (newJamData) => {
@@ -80,19 +92,42 @@ export default function Tracks() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {myJams.map((jam, index) => (
+        {/* ////////////search///////// */}
+        <div className="my-4 px-6">
+          <input
+            type="text"
+            placeholder="Search by title, genre, key, or bpm..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border border-gray-300 rounded-lg p-2 w-full"
+          />
+        </div>
+        {/*///////// search ///////////*/}
+
+        <div className="px-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredJams.map((jam, index) => (
+              <div
+                key={index}
+                className="bg-[#F1F5F7] border border-gray-200 rounded-lg shadow-xl transform transition-all hover:scale-105 hover:shadow-2xl p-6"
+              >
+                <JamCard jam={jam} />
+              </div>
+            ))}
+
+            {/* {myJams.map((jam, index) => (
             <div
               key={index}
               className="bg-[#F1F5F7] border border-gray-200 rounded-lg shadow-xl transform transition-all hover:scale-105 hover:shadow-2xl p-6"
             >
               <JamCard jam={jam} />
             </div>
-          ))}
+          ))} */}
 
-          {/* Render New Jam Card */}
-          <div className="bg-gray-100 border border-dashed border-gray-300 rounded-lg p-6 flex justify-center items-center hover:bg-gray-200 transition-colors duration-300">
-            <NewJamCard onCreate={handleCreateJam} />
+            {/* Render New Jam Card */}
+            <div className="bg-gray-100 border border-dashed border-gray-300 rounded-lg p-6 flex justify-center items-center hover:bg-gray-200 transition-colors duration-300">
+              <NewJamCard onCreate={handleCreateJam} />
+            </div>
           </div>
         </div>
         <footer className="bg-gray-800 text-white py-4">
