@@ -1,8 +1,6 @@
-
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import WebcamRecorder from './WebcamRecorder';
-import VideoPlayer from './VideoPlayer';
 import {
   getTrack,
   getTracksByJamId,
@@ -10,7 +8,7 @@ import {
 } from '@/utils/firebase/queries';
 import { getVideosByJamId } from '@/utils/firebase/queries';
 import MultiVideoPlayer from './MultiVideoPlayer';
-
+import VideoManager from './VideoManager';
 const page = async ({ params }) => {
   const { id } = await params;
   const jamId = id;
@@ -33,10 +31,11 @@ const page = async ({ params }) => {
       <div className="instruments ">
         <div>
           <div>
-            <div className="w-full ">
-              <MultiVideoPlayer controls={true} videos={videos.slice(0, Math.ceil(videos.length/2))} jamId={jamId} />
+            <div className="w-full h-fit ">
+              <VideoManager jamId={jamId} existingVideos={videos} />
+              {/* <MultiVideoPlayer controls={true} videos={videos.slice(0, Math.ceil(videos.length/2))} jamId={jamId} />
               <WebcamRecorder jamId={jamId} />
-              <MultiVideoPlayer controls={false} videos={videos.slice(Math.ceil(videos.length/2))} jamId={jamId} />
+              <MultiVideoPlayer controls={false} videos={videos.slice(Math.ceil(videos.length/2))} jamId={jamId} /> */}
             </div>
           </div>
         </div>
