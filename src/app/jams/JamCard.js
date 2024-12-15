@@ -1,14 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getVideosByJamId } from '@/utils/firebase/queries';
 
 const JamCard = ({ jam }) => {
-  const videoId = 'n2_IflHo-B0';
   const [videoUrl, setVideoUrl] = useState(null);
-
-  console.log('INSIDE OF JAM', jam.id);
+  const [rating, setRating] = useState(jam.starRating || 5); // Use the starRating from the database, fallback to 5 if not available
+  const videoRef = useRef(null); // Reference for the video element
+  const [isPlaying, setIsPlaying] = useState(false); // State to track if video is playing
 
   // Fetch the video URL using jam.id when the component mounts
   useEffect(() => {
@@ -25,19 +25,30 @@ const JamCard = ({ jam }) => {
     fetchVideoUrl();
   }, [jam?.id]);
 
-  getVideosByJamId(jam.id);
-
-  const [rating, setRating] = useState(5);
-
-  const youtubeThumbnailUrl = `https://img.youtube.com/vi/4WqAe7e_H5o/maxresdefault.jpg`;
+  // Handle Preview/Stop Button Click
+  const handlePreviewStop = () => {
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        videoRef.current.play();
+        setIsPlaying(true); // Set isPlaying to true when the video starts
+      } else {
+        videoRef.current.pause();
+        setIsPlaying(false); // Set isPlaying to false when the video pauses
+      }
+    }
+  };
 
   return (
     <div>
-      {/* Add YouTube Thumbnail */}
       {/* Video Player */}
       <div className="aspect-w-16 aspect-h-9 mb-4">
         {videoUrl ? (
-          <video controls src={videoUrl} className="w-full h-full rounded-lg">
+          <video
+            ref={videoRef}
+            controls
+            src={videoUrl}
+            className="w-full h-full rounded-lg"
+          >
             Your browser does not support the video tag.
           </video>
         ) : (
@@ -50,29 +61,33 @@ const JamCard = ({ jam }) => {
       <p className="text-lg text-gray-600 mt-1">Key: {jam.key}</p>
       <p className="text-lg text-gray-600 mt-1">BPM: {jam.bpm}</p>
 
-      <div className="flex items-center">
+      {/* Rating Stars */}
+      <div className="flex items-center pt-2 pb-4 pl-0 ml-0">
         {[...Array(5)].map((_, index) => (
           <svg
             key={index}
-            onClick={() => setRating(index + 1)}
             xmlns="http://www.w3.org/2000/svg"
             fill={index < rating ? 'yellow' : 'gray'}
             viewBox="0 0 24 24"
             stroke="currentColor"
-            className="w-6 h-6 cursor-pointer"
+            className="w-8 h-8 cursor-pointer"
+            onClick={() => setRating(index + 1)} // Optional: allow user to click and update the rating
           >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth="2"
+              strokeWidth="1"
               d="M12 4.5l1.42 4.38h4.63L14.8 11.5l1.42 4.38-3.6-2.63-3.6 2.63L10.2 11.5 7.92 8.88h4.63L12 4.5z"
             />
           </svg>
         ))}
       </div>
       <div className="flex align-middle justify-center">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Preview
+        <button
+          onClick={handlePreviewStop}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          {isPlaying ? 'Stop' : 'Preview'}
         </button>
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2">
           <Link href={`/jams/${jam.id}`}>Collaborate</Link>
