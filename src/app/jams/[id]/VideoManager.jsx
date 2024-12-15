@@ -75,7 +75,7 @@ const VideoControlPanel = ({
             {!videoBlob ? (
               <button
                 onClick={!isRecording ? onStartRecording : onStopRecording}
-                disabled={uploading  || !isRecordingMode}
+                disabled={uploading || !isRecordingMode}
                 className={`p-3 text-white rounded-full transition-colors ${
                   isRecordingMode
                     ? 'bg-red-500 hover:bg-red-600'
@@ -331,6 +331,7 @@ const VideoManager = ({ jamId, existingVideos = [] }) => {
             setUploading(false);
             setUploadProgress(100);
             setUploadComplete(true);
+            window.location.reload();
           } catch (err) {
             setError('Failed to get download URL: ' + err.message);
             setUploading(false);
@@ -351,10 +352,9 @@ const VideoManager = ({ jamId, existingVideos = [] }) => {
 
   return (
     <div className="min-h-screen bg-[#191825]  pb-24 flex flex-col items-center">
-      <h1 className='text-5xl font-bold text-white'>Jam Studio</h1>
+      <h1 className="text-5xl font-bold text-white">Jam Studio</h1>
 
       <div className="w-full">
-
         {error && (
           <div className="p-3 mx-auto max-w-6xl mb-4 text-sm text-red-500 bg-red-50 rounded">
             {error}
