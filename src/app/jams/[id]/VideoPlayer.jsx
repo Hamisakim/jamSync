@@ -3,9 +3,6 @@ import React from 'react';
 
 const VideoPlayer = async ({url}) => {
 
-
-
-
   return (
     <div>
       <video
