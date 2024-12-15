@@ -33,9 +33,10 @@ const page = async ({ params }) => {
       <div className="instruments ">
         <div>
           <div>
-            <div className="w-full grid grid-cols-3 gap-4">
-              <MultiVideoPlayer videos={videos} jamId={jamId} />
+            <div className="w-full ">
+              <MultiVideoPlayer controls={true} videos={videos.slice(0, Math.ceil(videos.length/2))} jamId={jamId} />
               <WebcamRecorder jamId={jamId} />
+              <MultiVideoPlayer controls={false} videos={videos.slice(Math.ceil(videos.length/2))} jamId={jamId} />
             </div>
           </div>
         </div>
