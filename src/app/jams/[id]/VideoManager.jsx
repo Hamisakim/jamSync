@@ -75,7 +75,7 @@ const VideoControlPanel = ({
             {!videoBlob ? (
               <button
                 onClick={!isRecording ? onStartRecording : onStopRecording}
-                disabled={uploading || isPlaying || !isRecordingMode}
+                disabled={uploading  || !isRecordingMode}
                 className={`p-3 text-white rounded-full transition-colors ${
                   isRecordingMode
                     ? 'bg-red-500 hover:bg-red-600'
