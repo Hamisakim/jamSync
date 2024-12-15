@@ -109,7 +109,7 @@ export default function Tracks() {
             {filteredJams.map((jam, index) => (
               <div
                 key={index}
-                className="bg-[#F1F5F7] border border-gray-200 rounded-lg shadow-xl transform transition-all hover:scale-105 hover:shadow-2xl p-6"
+                className="bg-[#E4E7EB] border border-gray-200 rounded-lg shadow-xl transform transition-all hover:scale-105 hover:shadow-2xl p-6"
               >
                 <JamCard jam={jam} />
               </div>
