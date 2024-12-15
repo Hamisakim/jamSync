@@ -1,4 +1,4 @@
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, addDoc } from 'firebase/firestore';
 import { db, storage } from './firebaseConfig';
 import { listAll, ref, getDownloadURL } from 'firebase/storage';
 
@@ -74,3 +74,14 @@ export const getVideosByJamId = async (jamId) => {
   }
   return urls;
 };
+
+// Function to create a new Jam
+export async function createJam(newJamData) {
+  try {
+    const docRef = await addDoc(collection(db, 'jams'), newJamData);
+    return { id: docRef.id, ...newJamData }; // Return the new Jam data with its ID
+  } catch (error) {
+    console.error('Error creating Jam:', error);
+    throw error;
+  }
+}
