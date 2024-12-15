@@ -1,6 +1,16 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, RotateCcw, Video, Square, Upload, Undo, Volume2, VolumeX } from 'lucide-react';
+import {
+  Play,
+  Pause,
+  RotateCcw,
+  Video,
+  Square,
+  Upload,
+  Undo,
+  Volume2,
+  VolumeX,
+} from 'lucide-react';
 import { storage } from '@/utils/firebase/firebaseConfig';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
@@ -40,7 +50,7 @@ const VideoPlayer = ({ url }) => {
   );
 };
 
-const VideoControlPanel = ({ 
+const VideoControlPanel = ({
   isRecording,
   videoBlob,
   uploading,
@@ -54,7 +64,7 @@ const VideoControlPanel = ({
   onResetRecording,
   onUpload,
   onPlayPause,
-  onReset
+  onReset,
 }) => {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
@@ -67,11 +77,15 @@ const VideoControlPanel = ({
                 onClick={!isRecording ? onStartRecording : onStopRecording}
                 disabled={uploading || isPlaying || !isRecordingMode}
                 className={`p-3 text-white rounded-full transition-colors ${
-                  isRecordingMode 
-                    ? 'bg-red-500 hover:bg-red-600' 
+                  isRecordingMode
+                    ? 'bg-red-500 hover:bg-red-600'
                     : 'bg-gray-300 cursor-not-allowed'
                 } disabled:opacity-50`}
-                title={isRecordingMode ? "Start Recording" : "Switch to recording mode to record"}
+                title={
+                  isRecordingMode
+                    ? 'Start Recording'
+                    : 'Switch to recording mode to record'
+                }
               >
                 {isRecording ? (
                   <Square className="w-5 h-5" />
@@ -93,7 +107,9 @@ const VideoControlPanel = ({
                   onClick={onUpload}
                   disabled={uploading || uploadComplete}
                   className="p-3 text-white bg-green-500 hover:bg-green-600 rounded-full transition-colors disabled:opacity-50"
-                  title={uploadComplete ? "Upload Complete" : "Upload Recording"}
+                  title={
+                    uploadComplete ? 'Upload Complete' : 'Upload Recording'
+                  }
                 >
                   {uploading ? (
                     <div className="relative">
@@ -119,7 +135,13 @@ const VideoControlPanel = ({
               onClick={onPlayPause}
               disabled={isRecording || !hasExistingVideos}
               className="p-3 text-white bg-blue-500 hover:bg-blue-600 rounded-full transition-colors disabled:opacity-50"
-              title={hasExistingVideos ? (isPlaying ? "Pause All" : "Play All") : "No videos to play"}
+              title={
+                hasExistingVideos
+                  ? isPlaying
+                    ? 'Pause All'
+                    : 'Play All'
+                  : 'No videos to play'
+              }
             >
               {isPlaying ? (
                 <Pause className="w-5 h-5" />
@@ -131,7 +153,7 @@ const VideoControlPanel = ({
               onClick={onReset}
               disabled={isRecording || !hasExistingVideos}
               className="p-3 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors disabled:opacity-50"
-              title={hasExistingVideos ? "Reset All" : "No videos to reset"}
+              title={hasExistingVideos ? 'Reset All' : 'No videos to reset'}
             >
               <RotateCcw className="w-5 h-5" />
             </button>
@@ -181,7 +203,7 @@ const VideoManager = ({ jamId, existingVideos = [] }) => {
 
     return () => {
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current.getTracks().forEach((track) => track.stop());
       }
       if (recordingTimeoutRef.current) {
         clearTimeout(recordingTimeoutRef.current);
@@ -194,7 +216,7 @@ const VideoManager = ({ jamId, existingVideos = [] }) => {
       videoRef.current.srcObject = null;
       videoRef.current.src = videoBlob;
       videoRef.current.load();
-      videoRef.current.play().catch(err => setError(err.message));
+      videoRef.current.play().catch((err) => setError(err.message));
     }
   }, [videoBlob]);
 
@@ -202,8 +224,10 @@ const VideoManager = ({ jamId, existingVideos = [] }) => {
     try {
       setIsRecording(true);
       chunksRef.current = [];
-      
-      const mediaRecorder = new MediaRecorder(streamRef.current, { mimeType: 'video/webm' });
+
+      const mediaRecorder = new MediaRecorder(streamRef.current, {
+        mimeType: 'video/webm',
+      });
       mediaRecorderRef.current = mediaRecorder;
 
       mediaRecorder.ondataavailable = (event) => {
@@ -252,7 +276,7 @@ const VideoManager = ({ jamId, existingVideos = [] }) => {
 
   const handlePlayAll = () => {
     const players = document.querySelectorAll('video');
-    players.forEach(player => {
+    players.forEach((player) => {
       player.play();
     });
     setIsPlaying(true);
@@ -260,7 +284,7 @@ const VideoManager = ({ jamId, existingVideos = [] }) => {
 
   const handlePauseAll = () => {
     const players = document.querySelectorAll('video');
-    players.forEach(player => {
+    players.forEach((player) => {
       player.pause();
     });
     setIsPlaying(false);
@@ -268,7 +292,7 @@ const VideoManager = ({ jamId, existingVideos = [] }) => {
 
   const handleResetAll = () => {
     const players = document.querySelectorAll('video');
-    players.forEach(player => {
+    players.forEach((player) => {
       player.currentTime = 0;
       player.pause();
     });
@@ -284,7 +308,7 @@ const VideoManager = ({ jamId, existingVideos = [] }) => {
 
       const response = await fetch(videoBlob);
       const blobData = await response.blob();
-      
+
       const fileName = `${jamId}/${Date.now()}.webm`;
       const storageRef = ref(storage, fileName);
       const uploadTask = uploadBytesResumable(storageRef, blobData);
@@ -326,50 +350,74 @@ const VideoManager = ({ jamId, existingVideos = [] }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      {error && (
-        <div className="p-3 mx-auto max-w-2xl mt-4 text-sm text-red-500 bg-red-50 rounded">
-          {error}
-        </div>
-      )}
+    <div className="min-h-screen bg-gray-50 pb-24 flex items-center">
+      <div className="w-full">
+        {error && (
+          <div className="p-3 mx-auto max-w-6xl mb-4 text-sm text-red-500 bg-red-50 rounded">
+            {error}
+          </div>
+        )}
 
-      {/* Camera Preview - Now always shown */}
-      <div className="w-full max-w-2xl mx-auto p-4">
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted={!videoBlob}
-          loop={!!videoBlob}
-          className="w-full aspect-video bg-black rounded-lg"
-          controls={!!videoBlob}
+        <div className="w-full max-w-7xl mx-auto p-4">
+          <div className="grid grid-cols-3 gap-4 auto-rows-fr">
+            {/* Row 1: First 3 videos */}
+            {existingVideos.slice(0, 3).map((video, index) => (
+              <div key={`top-${index}`} className="w-full">
+                <VideoPlayer url={video} />
+              </div>
+            ))}
+
+            {/* Row 2: 2 videos + camera in middle */}
+            {existingVideos.slice(3, 4).map((video, index) => (
+              <div key={`mid-left-${index}`} className="w-full">
+                <VideoPlayer url={video} />
+              </div>
+            ))}
+
+            {/* Camera Preview */}
+            <div className="w-full">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted={!videoBlob}
+                loop={!!videoBlob}
+                className="w-full aspect-video bg-black rounded-lg shadow-lg"
+                controls={!!videoBlob}
+              />
+            </div>
+
+            {existingVideos.slice(4, 5).map((video, index) => (
+              <div key={`mid-right-${index}`} className="w-full">
+                <VideoPlayer url={video} />
+              </div>
+            ))}
+
+            {/* Row 3: Last 3 videos */}
+            {existingVideos.slice(5, 8).map((video, index) => (
+              <div key={`bottom-${index}`} className="w-full">
+                <VideoPlayer url={video} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <VideoControlPanel
+          isRecording={isRecording}
+          videoBlob={videoBlob}
+          uploading={uploading}
+          uploadProgress={uploadProgress}
+          uploadComplete={uploadComplete}
+          isPlaying={isPlaying}
+          hasExistingVideos={existingVideos.length > 0}
+          onStartRecording={startRecording}
+          onStopRecording={stopRecording}
+          onResetRecording={resetRecording}
+          onUpload={handleUpload}
+          onPlayPause={isPlaying ? handlePauseAll : handlePlayAll}
+          onReset={handleResetAll}
         />
       </div>
-
-      {/* Existing videos grid */}
-      {existingVideos.length > 0 && (
-        <div className={`grid ${getGridCols(existingVideos.length)} gap-2 place-items-center mx-auto p-4`}>
-          {existingVideos.map((video, index) => (
-            <VideoPlayer key={index} url={video} />
-          ))}
-        </div>
-      )}
-
-      <VideoControlPanel
-        isRecording={isRecording}
-        videoBlob={videoBlob}
-        uploading={uploading}
-        uploadProgress={uploadProgress}
-        uploadComplete={uploadComplete}
-        isPlaying={isPlaying}
-        hasExistingVideos={existingVideos.length > 0}
-        onStartRecording={startRecording}
-        onStopRecording={stopRecording}
-        onResetRecording={resetRecording}
-        onUpload={handleUpload}
-        onPlayPause={isPlaying ? handlePauseAll : handlePlayAll}
-        onReset={handleResetAll}
-      />
     </div>
   );
 };
